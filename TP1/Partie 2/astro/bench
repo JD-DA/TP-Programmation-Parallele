@@ -1,0 +1,15 @@
+#!/bin/sh
+IMAGE=${IMAGE:-fits/m101_optical.fits}
+FILTER=${FILTER:-linear}
+ITERATE=${ITERATE:-10}
+make $FILTER
+(echo schedule, threads, bs, time
+for sch in static dynamic; do 
+  for j in 1 16 1024 4096; do 
+    echo
+    for i in 1 2 4 8; do
+      /bin/echo -n "$sch, $i, $j, "
+      OMP_NUM_THREADS=$i OMP_SCHEDULE=$sch,$j ./$FILTER $IMAGE $ITERATE
+    done
+  done
+done) | tee stats.csv

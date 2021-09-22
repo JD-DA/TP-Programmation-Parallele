@@ -1,0 +1,41 @@
+schedule, threads, bs, time
+
+static, 1, 1, 0.246874
+static, 2, 1, 0.245777
+static, 4, 1, 0.249333
+static, 8, 1, 0.248473
+
+static, 1, 16, 0.246172
+static, 2, 16, 0.246755
+static, 4, 16, 0.246594
+static, 8, 16, 0.248261
+
+static, 1, 1024, 0.247347
+static, 2, 1024, 0.248047
+static, 4, 1024, 0.246981
+static, 8, 1024, 0.245473
+
+static, 1, 4096, 0.247455
+static, 2, 4096, 0.247458
+static, 4, 4096, 0.246912
+static, 8, 4096, 0.247077
+
+dynamic, 1, 1, 0.246678
+dynamic, 2, 1, 0.247109
+dynamic, 4, 1, 0.247638
+dynamic, 8, 1, 0.248704
+
+dynamic, 1, 16, 0.24611
+dynamic, 2, 16, 0.245675
+dynamic, 4, 16, 0.246956
+dynamic, 8, 16, 0.246668
+
+dynamic, 1, 1024, 0.245432
+dynamic, 2, 1024, 0.246706
+dynamic, 4, 1024, 0.246566
+dynamic, 8, 1024, 0.248439
+
+dynamic, 1, 4096, 0.246947
+dynamic, 2, 4096, 0.245743
+dynamic, 4, 4096, 0.245903
+dynamic, 8, 4096, 0.245989
