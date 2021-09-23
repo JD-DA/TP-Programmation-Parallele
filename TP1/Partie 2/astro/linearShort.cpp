@@ -18,7 +18,7 @@ int main(int, char *argv[]) {
 
   for (int k = 0; k < iterations; k++) {
       ///////////////////// MODIFIER A PARTIR D'ICI UNIQUEMENT /////////////////
-#pragma omp parallel for collapse(2)  reduction(min:amin) reduction(max:amax) private(i,j) schedule(runtime)
+#pragma omp parallel for collapse(2)  reduction(min:amin) reduction(max:amax) private(i,j)  schedule(runtime) //schedule(dynamic , 100)
       for (j = 0; j < astro.height(); j++)
               for ( i = 0; i < astro.width(); i++) {
                   amin = min(amin, astro(i, j));
