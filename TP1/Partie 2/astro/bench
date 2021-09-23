@@ -1,6 +1,6 @@
 #!/bin/sh
 IMAGE=${IMAGE:-fits/m101_optical.fits}
-FILTER=${FILTER:-linear}
+FILTER=${FILTER:-linearShort}
 ITERATE=${ITERATE:-10}
 make $FILTER
 (echo schedule, threads, bs, time

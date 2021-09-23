@@ -1,41 +1,41 @@
 schedule, threads, bs, time
 
-static, 1, 1, 0.246874
-static, 2, 1, 0.245777
-static, 4, 1, 0.249333
-static, 8, 1, 0.248473
+static, 1, 1, 0.237749
+static, 2, 1, 0.56602
+static, 4, 1, 0.496041
+static, 8, 1, 0.486493
 
-static, 1, 16, 0.246172
-static, 2, 16, 0.246755
-static, 4, 16, 0.246594
-static, 8, 16, 0.248261
+static, 1, 16, 0.25622
+static, 2, 16, 0.21325
+static, 4, 16, 0.20024
+static, 8, 16, 0.176008
 
-static, 1, 1024, 0.247347
-static, 2, 1024, 0.248047
-static, 4, 1024, 0.246981
-static, 8, 1024, 0.245473
+static, 1, 1024, 0.261607
+static, 2, 1024, 0.189531
+static, 4, 1024, 0.182005
+static, 8, 1024, 0.153144
 
-static, 1, 4096, 0.247455
-static, 2, 4096, 0.247458
-static, 4, 4096, 0.246912
-static, 8, 4096, 0.247077
+static, 1, 4096, 0.2596
+static, 2, 4096, 0.186362
+static, 4, 4096, 0.17504
+static, 8, 4096, 0.148965
 
-dynamic, 1, 1, 0.246678
-dynamic, 2, 1, 0.247109
-dynamic, 4, 1, 0.247638
-dynamic, 8, 1, 0.248704
+dynamic, 1, 1, 0.981593
+dynamic, 2, 1, 0.931421
+dynamic, 4, 1, 0.667048
+dynamic, 8, 1, 0.662302
 
-dynamic, 1, 16, 0.24611
-dynamic, 2, 16, 0.245675
-dynamic, 4, 16, 0.246956
-dynamic, 8, 16, 0.246668
+dynamic, 1, 16, 0.30502
+dynamic, 2, 16, 0.247479
+dynamic, 4, 16, 0.222974
+dynamic, 8, 16, 0.2029
 
-dynamic, 1, 1024, 0.245432
-dynamic, 2, 1024, 0.246706
-dynamic, 4, 1024, 0.246566
-dynamic, 8, 1024, 0.248439
+dynamic, 1, 1024, 0.255959
+dynamic, 2, 1024, 0.17927
+dynamic, 4, 1024, 0.158563
+dynamic, 8, 1024, 0.141561
 
-dynamic, 1, 4096, 0.246947
-dynamic, 2, 4096, 0.245743
-dynamic, 4, 4096, 0.245903
-dynamic, 8, 4096, 0.245989
+dynamic, 1, 4096, 0.27158
+dynamic, 2, 4096, 0.176222
+dynamic, 4, 4096, 0.169508
+dynamic, 8, 4096, 0.141706

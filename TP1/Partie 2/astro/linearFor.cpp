@@ -20,14 +20,11 @@ int main(int, char *argv[]) {
       ///////////////////// MODIFIER A PARTIR D'ICI UNIQUEMENT /////////////////
 #pragma omp parallel
       {
-          int id = omp_get_thread_num();
-          int num = omp_get_num_threads();
           unsigned short locAmin=0;
           unsigned short locAmax=0;
-#pragma omp critical
-          std::cout<<"le thread n°"<<id<<" est en cours d'execution"<<std::endl;
-          for (j = id; j < astro.height(); j+=num)
-              for (i = 0; i < astro.width(); i++) {
+#pragma omp for collapse(2)
+          for (j = 0; j < astro.height(); j++)
+              for (int i = 0; i < astro.width(); i++) {
                   locAmin = min(locAmin, astro(i, j));
                   locAmax = max(locAmax, astro(i, j));
               }
@@ -38,28 +35,15 @@ int main(int, char *argv[]) {
       }
 
       unsigned short arange = amax - amin;
-      long len=0;
-#pragma omp parallel private i,j
+#pragma omp parallel
       {
-          int id = omp_get_thread_num();
-          int num = omp_get_num_threads();
-
-#pragma omp critical
-          std::cout << "le thread n°" << id << " est en cours d'execution" << std::endl;
-          int lenLocal = 0;
-          for (j = id; j < astro.height(); j += num) {
-              lenLocal += 1;
-              for (i = 0; i < astro.width(); i++)
+#pragma omp for collapse(2)
+          for (j = 0; j < astro.height(); j++) {
+              for (int i = 0; i < astro.width(); i++)
                   resca(i, j) = (astro(i, j) - amin) * 255 / arange;
-          }
-#pragma omp critical
-          {
-              len += lenLocal;
-              std::cout << "le thread n°" << id << " a parcouru "<<lenLocal<<" lignes" << std::endl;
           }
 
       }
-      std::cout<<"le nombre de ligne parcouru est"<<len<<" sur "<<astro.height()<<std::endl;
       ///////////////////// MODIFIER JUSQU'ICI UNIQUEMENT /////////////////////
   }
   double end = omp_get_wtime();
