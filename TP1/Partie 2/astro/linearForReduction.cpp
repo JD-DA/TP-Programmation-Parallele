@@ -18,15 +18,14 @@ int main(int, char *argv[]) {
 
   for (int k = 0; k < iterations; k++) {
       ///////////////////// MODIFIER A PARTIR D'ICI UNIQUEMENT /////////////////
-#pragma omp parallel
-      {
-#pragma omp for collapse(2)  reduction(min:amin) reduction(max:amax) private(i,j)
+
+#pragma omp parallel for collapse(2)  reduction(min:amin) reduction(max:amax)
           for (j = 0; j < astro.height(); j++)
               for ( i = 0; i < astro.width(); i++) {
                   amin = min(amin, astro(i, j));
                   amax = max(amax, astro(i, j));
               }
-      }
+
       unsigned short arange = amax - amin;
 #pragma omp parallel
       {
