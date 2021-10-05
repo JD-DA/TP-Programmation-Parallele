@@ -140,19 +140,65 @@ static void do_tile (int x, int y, int width, int height, int who)
 ///////////////////////////// OMP version TP tiled
 unsigned baker_compute_omp_tiled (unsigned nb_iter)
 {
+
+#pragma omp parallel for collapse(2)
+    for (int y = 0; y < DIM; y += TILE_H){
+        for (int x = 0; x < DIM; x += TILE_W) {
+            do_tile(x, y, TILE_W, TILE_H,  omp_get_thread_num()/* CPU id */);
+        }
+    }
+
+    swap_images();
+
+    return 0;
+}
+
+unsigned baker_compute_corners (unsigned nb_iter){
+    int w = DIM/2;
+    int h = DIM/2;
     for (unsigned it = 1; it <= nb_iter; it++) {
 #pragma omp parallel for collapse(2)
-        for (int y = 0; y < DIM; y += TILE_H){
-            for (int x = 0; x < DIM; x += TILE_W) {
-                printf("x : %d\n", x);
-                printf("y : %d\n\n", y);
-                do_tile(x, y, TILE_W, TILE_H,  omp_get_thread_num()/* CPU id */);
+        for (int i = 0; i < DIM; i++) {
+            for (int j = 0; j < 1; j++) {
+                int originX = i;
+                int originY = j;
+                //printf("origin%d:%d\n",originX,originY);
+                int cycle = 1;
+                float x1 = j/2;
+                float x2 = j%2;
+                int curX,curY;
+                if(i<DIM/2){
+                    curX=2*i+x2;
+                    curY=x1;
+                    //next_img(i,j)=cur_img(2*i+x2,x1);
+                }else{
+                    curX=4*h-2*i-x2-1;
+                    curY=2*w-x1-1;
+                    //next_img(i,j)=cur_img(4*h-2*i-x2-1,2*w-x1-1);
+                }
+                //printf("c1 : %d:%d\n",curX,curY);
+                while(originX!=curX || originY!=curY){
+                    i = curX;
+                    j = curY;
+                    cycle++;
+                    float x1 = j/2;
+                    float x2 = j%2;
+                    if(i<h){
+                        curX=2*i+x2;
+                        curY=x1;
+                        //next_img(i,j)=cur_img(2*i+x2,x1);
+                    }else{
+                        curX=4*h-2*i-x2-1;
+                        curY=2*w-x1-1;
+                        //next_img(i,j)=cur_img(4*h-2*i-x2-1,2*w-x1-1);
+                    }
+                    //printf("c%d : %d:%d\n",cycle,curX,curY);
+                }
+                printf("Pour le pixel de coor : %d:%d (i:j) on a un cycle de :%d\n",originX,originY,cycle);
             }
         }
 
     }
-    swap_images();
-
     return 0;
 }
 
