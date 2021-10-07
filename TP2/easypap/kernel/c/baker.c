@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <omp.h>
+//#include <stdbool.h>
 
 static void rotate (void);
 static unsigned compute_color (int i, int j);
@@ -153,13 +154,21 @@ unsigned baker_compute_omp_tiled (unsigned nb_iter)
     return 0;
 }
 
+int pgcd(int a, int b) {
+    if (b == 0)
+        return a;
+    else
+        return pgcd(b, a % b);
+}
+
 unsigned baker_compute_corners (unsigned nb_iter){
     int w = DIM/2;
     int h = DIM/2;
+    int cycleList[DIM*DIM];
     for (unsigned it = 1; it <= nb_iter; it++) {
 #pragma omp parallel for collapse(2)
         for (int i = 0; i < DIM; i++) {
-            for (int j = 0; j < 1; j++) {
+            for (int j = 0; j < DIM; j++) {
                 int originX = i;
                 int originY = j;
                 //printf("origin%d:%d\n",originX,originY);
@@ -177,30 +186,73 @@ unsigned baker_compute_corners (unsigned nb_iter){
                     //next_img(i,j)=cur_img(4*h-2*i-x2-1,2*w-x1-1);
                 }
                 //printf("c1 : %d:%d\n",curX,curY);
-                while(originX!=curX || originY!=curY){
-                    i = curX;
-                    j = curY;
+                int compteur=0;
+                //printf("%d,%d\n",curX,curY);
+                while((originX!=curX || originY!=curY) && compteur<10000){
+                    //printf("%d,%d\n",curX,curY);
                     cycle++;
-                    float x1 = j/2;
-                    float x2 = j%2;
-                    if(i<h){
-                        curX=2*i+x2;
+                    float x1 = curY/2;
+                    float x2 = curY%2;
+                    if(curX<h){
+                        curX=2*curX+x2;
                         curY=x1;
                         //next_img(i,j)=cur_img(2*i+x2,x1);
                     }else{
-                        curX=4*h-2*i-x2-1;
+                        curX=4*h-2*curX-x2-1;
                         curY=2*w-x1-1;
                         //next_img(i,j)=cur_img(4*h-2*i-x2-1,2*w-x1-1);
                     }
+                    compteur++;
                     //printf("c%d : %d:%d\n",cycle,curX,curY);
                 }
-                printf("Pour le pixel de coor : %d:%d (i:j) on a un cycle de :%d\n",originX,originY,cycle);
+#pragma omp critical
+                cycleList[originY*DIM+originX]=cycle;
+                printf("Pour le pixel de coor : %d:%d (i:j) on a un cycle de :%d\t%d\n",originX,originY,cycle,cycleList[originY*DIM+originX]);
+            }
+
+        }
+        /*for(int m = 0; m<=10;m++){
+            printf("%d ",cycleList[m]);
+        }*/
+        printf("\n");
+        int cycleListUniq[DIM*DIM];
+        int index=0;
+        for (int i = 0; i < DIM; i++) {
+            for (int j = 0; j < DIM; j++) {
+                int num = cycleList[i + j*DIM];
+                //printf("%d \n",num);
+                int present = 0;
+                for(int m = 0; m<=index;m++){
+                    //printf("\t%d \n",cycleList[m]);
+                    if(num==cycleListUniq[m]){
+                        //printf("present!");
+                        present=1;
+                        break;
+                    }
+                }
+                if(0==present){
+                    cycleListUniq[index++]=num;
+                }
+                //printf("%d \n",cycleList[i+j]);
+
             }
         }
+        for(int m = 1; m<index;m++) {
+            printf("%d ",cycleListUniq[m]);
+        }
+        /*
+        int ppcm=cycleListUniq[0];
+        int lepgcd;
+        for(int m = 1; m<index;m++){
+            lepgcd = pgcd(ppcm, cycleListUniq[m]);
+            ppcm = (ppcm*cycleListUniq[m])/lepgcd;
+            printf("%d ",ppcm);
+        }*/
 
     }
     return 0;
 }
+
 
 
 
