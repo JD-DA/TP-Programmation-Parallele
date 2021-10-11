@@ -20,18 +20,7 @@ int main(int argc, char *argv[]){
     	cout<<tab[i]<<",";
     }
     cout<<"]"<<endl;
-    if(pid%2==0) {
-        MPI_Ssend(tab, taille, MPI_INT, (pid + 1) % nprocs, tag, MPI_COMM_WORLD);
-        MPI_Recv(tab, taille, MPI_INT, (pid - 1 + nprocs) % nprocs, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    }else{
-        MPI_Recv(tab2, taille, MPI_INT, (pid - 1 + nprocs) % nprocs, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Ssend(tab, taille, MPI_INT, (pid + 1) % nprocs, tag, MPI_COMM_WORLD);
-        for(int i=0; i<taille; i++){
-            tab[i]=tab2[i];
-        }
-    }
-
-    //cout << "je suis " << pid << endl;
+    MPI_Sendrecv_replace(tab, taille, MPI_INT, (pid + 1) % nprocs, tag, MPI_COMM_WORLD,&status);
     cout<<"from "<<pid<<" r=[";
     for(int i=0; i<taille; i++){
     	cout<<tab[i]<<",";

@@ -2,11 +2,13 @@
 #include <mpi.h>
 
 using namespace std;
+//ici si on envoie un tab de taille 10 000 les procces se bloquent, ils attendent tous de pouvoir send
 int main(int argc, char *argv[]){
     int pid,nprocs;
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &pid);
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+    int a = pid;
     int taille = stoi(argv[1]);
     int tab[taille];
     int tab2[taille];
@@ -20,17 +22,8 @@ int main(int argc, char *argv[]){
     	cout<<tab[i]<<",";
     }
     cout<<"]"<<endl;
-    if(pid%2==0) {
-        MPI_Ssend(tab, taille, MPI_INT, (pid + 1) % nprocs, tag, MPI_COMM_WORLD);
-        MPI_Recv(tab, taille, MPI_INT, (pid - 1 + nprocs) % nprocs, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    }else{
-        MPI_Recv(tab2, taille, MPI_INT, (pid - 1 + nprocs) % nprocs, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        MPI_Ssend(tab, taille, MPI_INT, (pid + 1) % nprocs, tag, MPI_COMM_WORLD);
-        for(int i=0; i<taille; i++){
-            tab[i]=tab2[i];
-        }
-    }
-
+    MPI_Send(tab, taille, MPI_INT, (pid+1)%nprocs, tag, MPI_COMM_WORLD);
+    MPI_Recv(tab, taille, MPI_INT, (pid-1+nprocs)%nprocs, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     //cout << "je suis " << pid << endl;
     cout<<"from "<<pid<<" r=[";
     for(int i=0; i<taille; i++){
