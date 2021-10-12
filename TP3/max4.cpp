@@ -53,7 +53,8 @@ int main(int argc, char *argv[]) {
             }
 
             start+=sizeToSend;
-            MPI_Ssend(tabToSend, sizeToSend, MPI_INT, i, 0, MPI_COMM_WORLD);
+            MPI_Request req;
+            MPI_Issend(tabToSend, sizeToSend, MPI_INT, i, 0, MPI_COMM_WORLD,&req);
         }
         cout << "from " << pid << " r=[";
         int maximum = 0;
