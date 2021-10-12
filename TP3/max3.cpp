@@ -20,17 +20,16 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < taille; i++) {
             tab[i] = rand() % 1000 + 1;
         }
-        cout << "Tab : [";
-        for (int i = 0; i < taille; i++) {
-            cout << tab[i] << ",";
-        }
-        cout << "]" << endl;
 
         int smallChunk = taille % nprocs;
         int start = 0;
         int startRoot;      //start du tab que root va devoir analyser
         int endRoot;
-
+        cout << "Tab : [";
+        for (int n = 0; n < taille; n++) {
+            cout << tab[n] << ",";
+        }
+        cout << "]" << endl;
         for (int i = 0; i < nprocs; i++) {
 
             int sizeToSend = chunk;
@@ -38,6 +37,7 @@ int main(int argc, char *argv[]) {
                 sizeToSend++;
                 smallChunk--;
             }
+
             if(i==root) {           //dans le cas où on arrive au process root on incremente la taille et on continue
                 startRoot = start;
                 start+=sizeToSend;
@@ -47,9 +47,11 @@ int main(int argc, char *argv[]) {
             MPI_Ssend(&sizeToSend, 1, MPI_INT, i, 0, MPI_COMM_WORLD); //on envoie la taille du chunk
 
             int tabToSend[sizeToSend];
+            int index = 0;
             for (int j = start; j < start + sizeToSend; j++) {      //on part de start et on va jusqu'à start+sizetosend
-                tabToSend[j] = tab[j];
+                tabToSend[index++] = tab[j];
             }
+
             start+=sizeToSend;
             MPI_Ssend(tabToSend, sizeToSend, MPI_INT, i, 0, MPI_COMM_WORLD);
         }
@@ -60,6 +62,7 @@ int main(int argc, char *argv[]) {
             cout << tab[j] << ",";
         }
         cout << "]" << endl;
+
         cout << "Max found  by "<<pid<<" : " <<maximum<< endl;
 
         int res = 0;
@@ -90,5 +93,4 @@ int main(int argc, char *argv[]) {
     MPI_Finalize();
     return 0;
 }
-
 
