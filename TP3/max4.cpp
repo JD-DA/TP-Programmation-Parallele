@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
         cout << "Max found : " <<maximum<< endl;
     } else {
         int sizeChunk;
-        MPI_Recv(&sizeChunk, chunk, MPI_INT, root, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv(&sizeChunk, 1, MPI_INT, root, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         int tab[sizeChunk];
         MPI_Recv(tab, sizeChunk, MPI_INT, root, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         cout << "from " << pid << " r=[";
