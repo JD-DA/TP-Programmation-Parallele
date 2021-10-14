@@ -88,19 +88,19 @@ unsigned baker_compute_omp (unsigned nb_iter)
 static void do_tile_reg (int x, int y, int width, int height)
 {
 
-        int w = DIM/2;
-        int h = DIM/2;
-        for (int i = x; i < height+x; i++) {
-            for (int j = y; j < width+y; j++) {
-                float x1 = j/2;
-                float x2 = j%2;
-                if(i<h){
-                    next_img(i,j)=cur_img(2*i+x2,x1);
-                }else{
-                    next_img(i,j)=cur_img(4*h-2*i-x2-1,2*w-x1-1);
-                }
+    int w = DIM/2;
+    int h = DIM/2;
+    for (int i = x; i < height+x; i++) {
+        for (int j = y; j < width+y; j++) {
+            float x1 = j/2;
+            float x2 = j%2;
+            if(i<h){
+                next_img(i,j)=cur_img(2*i+x2,x1);
+            }else{
+                next_img(i,j)=cur_img(4*h-2*i-x2-1,2*w-x1-1);
             }
         }
+    }
     /*printf("x : %d\n",x);
     printf("%d\n",y);
     printf("%d\n",width);
@@ -161,14 +161,31 @@ int pgcd(int a, int b) {
         return pgcd(b, a % b);
 }
 
+
 unsigned baker_compute_corners (unsigned nb_iter){
     int w = DIM/2;
     int h = DIM/2;
     int cycleList[DIM*DIM];
+    int*** cyclelistcoor = (int***) malloc(sizeof (int**)*DIM); //cyclelistcoor[x][y] = {x1,y1,x2,y2,x3,y3...xcyclelength,ycyclelength}
+    int** cycleLength = (int**)malloc(sizeof(int*)); //cyclelength[x][y] = taille du cycle
+
+    for (int i=0;i<DIM;i++){
+        int **tab1= (int**)malloc(sizeof(int*)*DIM);
+        int *tabLen = (int*)malloc(sizeof(int)*DIM);
+        for (int j=0;j<DIM;j++){
+            int *tab2= (int*)malloc(sizeof(int)*10000);
+            tab1[j]=tab2;
+        }
+        cyclelistcoor[i]=tab1;
+        cycleLength[i]=tabLen;
+    }
     for (unsigned it = 1; it <= nb_iter; it++) {
 #pragma omp parallel for collapse(2)
         for (int i = 0; i < DIM; i++) {
             for (int j = 0; j < DIM; j++) {
+                int *tab2 = (int *) malloc(sizeof(int) * 10000);
+                tab2[0] = i;
+                tab2[1] = j;
                 int originX = i;
                 int originY = j;
                 //printf("origin%d:%d\n",originX,originY);
@@ -190,6 +207,8 @@ unsigned baker_compute_corners (unsigned nb_iter){
                 //printf("%d,%d\n",curX,curY);
                 while((originX!=curX || originY!=curY) && compteur<10000){
                     //printf("%d,%d\n",curX,curY);
+                    tab2[compteur++] = curX;
+                    tab2[compteur++] = curY;
                     cycle++;
                     float x1 = curY/2;
                     float x2 = curY%2;
@@ -214,6 +233,8 @@ unsigned baker_compute_corners (unsigned nb_iter){
         /*for(int m = 0; m<=10;m++){
             printf("%d ",cycleList[m]);
         }*/
+
+        //Pour pouvoir réduire le nombre de cycle et faire un pseudo set
         printf("\n");
         int cycleListUniq[DIM*DIM];
         int index=0;
