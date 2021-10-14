@@ -80,29 +80,29 @@ int main(int argc, char *argv[]) {
 
     float* tab_local = new float[n_local];
     MPI_Scatterv(tab,sendcounts,displ,MPI_FLOAT,tab_local,n_local,MPI_FLOAT,root,MPI_COMM_WORLD);
-    cout << "from " << pid << " r=[";
+    /*cout << "from " << pid << " r=[";
     for (int i = 0; i < n_local; i++) {
         cout << tab_local[i] << ",";
     }
-    cout << "]" << endl;
+    cout << "]" << endl;*/
     float norm = 0;
     for (int j = 0; j < n_local; j++) {
         norm += pow(tab_local[j],2);
     }
-    cout<<"from "<<pid<<" norm = "<<norm<<endl;
+    //cout<<"from "<<pid<<" norm = "<<norm<<endl;
     float normToSend = norm;
     MPI_Allreduce(&normToSend,&norm,1,MPI_FLOAT,MPI_SUM,MPI_COMM_WORLD);
     norm = pow(norm, 0.5);
-    cout<<"from "<<pid<<" norm after reduce = "<<norm<<endl;
+    //cout<<"from "<<pid<<" norm after reduce = "<<norm<<endl;
 
     for (int j = 0; j < n_local; j++) {
         tab_local[j] /= norm;
     }
-    cout <<"from "<<pid<< "Tablocal : [";
+    /*cout <<"from "<<pid<< "Tablocal : [";
     for (int n = 0; n < n_local; n++) {
         cout << tab_local[n] << ",";
     }
-    cout << "]" << endl;
+    cout << "]" << endl;*/
 
 
     MPI_Gather(tab_local, n_local , MPI_FLOAT , tab , n_local ,
