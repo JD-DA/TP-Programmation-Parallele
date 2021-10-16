@@ -166,24 +166,27 @@ unsigned baker_compute_corners (unsigned nb_iter){
     int w = DIM/2;
     int h = DIM/2;
     int cycleList[DIM*DIM];
+    printf("taille : %d,%d\n",DIM,DIM);
+    int largeur = DIM;
+    int hauteur = DIM;
     int*** cyclelistcoor = (int***) malloc(sizeof (int**)*DIM); //cyclelistcoor[x][y] = {x1,y1,x2,y2,x3,y3...xcyclelength,ycyclelength}
-    int** cycleLength = (int**)malloc(sizeof(int*)); //cyclelength[x][y] = taille du cycle
+    int** cycleLength = (int**)malloc(sizeof(int*)*DIM); //cyclelength[x][y] = taille du cycle
 
-    for (int i=0;i<DIM;i++){
+    for (int i=0;i<largeur;i++){
         int **tab1= (int**)malloc(sizeof(int*)*DIM);
         int *tabLen = (int*)malloc(sizeof(int)*DIM);
-        for (int j=0;j<DIM;j++){
-            int *tab2= (int*)malloc(sizeof(int)*10000);
+        /*for (int j=0;j<DIM;j++){
+            int *tab2= (int*)malloc(sizeof(int)*5000);
             tab1[j]=tab2;
-        }
+        }*/
         cyclelistcoor[i]=tab1;
         cycleLength[i]=tabLen;
     }
-    for (unsigned it = 1; it <= nb_iter; it++) {
+
 #pragma omp parallel for collapse(2)
-        for (int i = 0; i < DIM; i++) {
-            for (int j = 0; j < DIM; j++) {
-                int *tab2 = (int *) malloc(sizeof(int) * 10000);
+        for (int i = 0; i < largeur; i++) {
+            for (int j = 0; j < hauteur; j++) {
+                int *tab2 = (int *) malloc(sizeof(int) * 5000);
                 tab2[0] = i;
                 tab2[1] = j;
                 int originX = i;
@@ -203,9 +206,9 @@ unsigned baker_compute_corners (unsigned nb_iter){
                     //next_img(i,j)=cur_img(4*h-2*i-x2-1,2*w-x1-1);
                 }
                 //printf("c1 : %d:%d\n",curX,curY);
-                int compteur=0;
+                int compteur=2;
                 //printf("%d,%d\n",curX,curY);
-                while((originX!=curX || originY!=curY) && compteur<10000){
+                while((originX!=curX || originY!=curY) && compteur<5000){
                     //printf("%d,%d\n",curX,curY);
                     tab2[compteur++] = curX;
                     tab2[compteur++] = curY;
@@ -221,11 +224,15 @@ unsigned baker_compute_corners (unsigned nb_iter){
                         curY=2*w-x1-1;
                         //next_img(i,j)=cur_img(4*h-2*i-x2-1,2*w-x1-1);
                     }
-                    compteur++;
-                    //printf("c%d : %d:%d\n",cycle,curX,curY);
+                  //  printf("c%d : %d:%d\n",cycle,curX,curY);
                 }
+                //free(tab2);
 #pragma omp critical
-                cycleList[originY*DIM+originX]=cycle;
+                {
+                    cycleList[originY * DIM + originX] = cycle;
+                    cyclelistcoor[i][j]=tab2;
+                    cycleLength[i][j]=cycle;
+                }
                 printf("Pour le pixel de coor : %d:%d (i:j) on a un cycle de :%d\t%d\n",originX,originY,cycle,cycleList[originY*DIM+originX]);
             }
 
@@ -238,8 +245,8 @@ unsigned baker_compute_corners (unsigned nb_iter){
         printf("\n");
         int cycleListUniq[DIM*DIM];
         int index=0;
-        for (int i = 0; i < DIM; i++) {
-            for (int j = 0; j < DIM; j++) {
+        for (int i = 0; i < largeur; i++) {
+            for (int j = 0; j < hauteur; j++) {
                 int num = cycleList[i + j*DIM];
                 //printf("%d \n",num);
                 int present = 0;
@@ -269,8 +276,46 @@ unsigned baker_compute_corners (unsigned nb_iter){
             ppcm = (ppcm*cycleListUniq[m])/lepgcd;
             printf("%d ",ppcm);
         }*/
+    /*for (int i=0;i<largeur;i++){
+        for (int j=0;j<hauteur;j++){
+            int length = cycleLength[i][j];
+            printf("Taille du cycle : %d [",length);
+            for(int x = 0; x<length*2;x+=2){
+                printf("| %d/%d ",cyclelistcoor[i][j][x],cyclelistcoor[i][j][x+1]);
+            }
+            printf("\n");
+        }
+    }*/
+//#pragma omp parallel for collapse(2)
+    for (int i = 0; i < largeur; i++) {
+        for (int j = 0; j < hauteur; j++) {
+            int length = cycleLength[i][j];
+            int reste = 126661429%length;
+            /*printf("Pour %d/%d on a un cycle de %d et le reste est %d soit la coor %d/%d \n",i,j,length,reste,cyclelistcoor[i][j][reste*2],cyclelistcoor[i][j][reste*2+1]);
+            printf("Taille du cycle : %d [",length);
+            for(int x = 0; x<length*2;x+=2){
+                printf("| %d/%d ",cyclelistcoor[i][j][x],cyclelistcoor[i][j][x+1]);
+            }
+            printf("\n");
+             */
+            printf("From %d/%d to %d/%d",i,j,cyclelistcoor[i][j][reste*2],cyclelistcoor[i][j][reste*2+1]);
+            next_img(cyclelistcoor[i][j][reste*2],cyclelistcoor[i][j][reste*2+1])=cur_img(i,j);
 
+        }
     }
+    swap_images();
+
+
+    for (int i=0;i<largeur;i++){
+        for (int j=0;j<hauteur;j++) {
+            free(cyclelistcoor[i][j]);
+        }
+        free(cyclelistcoor[i]);
+        free(cycleLength[i]);
+    }
+    free(cyclelistcoor);
+    free(cycleLength);
+
     return 0;
 }
 
