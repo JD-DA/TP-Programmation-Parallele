@@ -163,10 +163,11 @@ int pgcd(int a, int b) {
 
 
 unsigned baker_compute_corners (unsigned nb_iter){
+    //
     int w = DIM/2;
     int h = DIM/2;
     int cycleList[DIM*DIM];
-    printf("taille : %d,%d\n",DIM,DIM);
+    printf("taille : %d\n",DIM);
     int largeur = DIM;
     int hauteur = DIM;
     int*** cyclelistcoor = (int***) malloc(sizeof (int**)*DIM); //cyclelistcoor[x][y] = {x1,y1,x2,y2,x3,y3...xcyclelength,ycyclelength}
@@ -182,7 +183,7 @@ unsigned baker_compute_corners (unsigned nb_iter){
 #pragma omp parallel for collapse(2)
         for (int i = 0; i < largeur; i++) {
             for (int j = 0; j < hauteur; j++) {
-                int *tab2 = (int *) malloc(sizeof(int) * 5000); //tableau qui va contenir chaque pixel du cycle
+                int *tab2 = (int *) malloc(sizeof(int) * 5000); //tableau qui va contenir chaque coordonnees des pixels du cycle
                 tab2[0] = i;
                 tab2[1] = j;
                 int originX = i;

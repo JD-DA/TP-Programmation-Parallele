@@ -175,3 +175,37 @@ static void rotate (void)
 {
   base_angle = fmodf (base_angle + (1.0 / 180.0) * M_PI, M_PI);
 }
+
+
+///////////////////////////////////////////////////////////////// Partie MPI
+
+static int mpi_rank = -1;
+static int mpi_size = -1;
+static int mpi_nbLigne = -1;
+static int mpi_ligne = -1;
+
+void spin_init_mpi(void)
+{
+    easypap_check_mpi();
+    MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
+    mpi_nbLigne = (DIM/mpi_size);
+    mpi_ligne = (DIM/mpi_size)*mpi_rank;
+}
+
+unsigned spin_compute_mpi(unsigned nb_iter)
+{
+    for (unsigned it=1; it<=nb_iter; it++) {
+        int x = 0;
+        int y = mpi_ligne;
+        int width = DIM;
+        int height = mpi_nbLigne;
+        int thread = mpi_rank;
+        do_tile(x,y,width,height,0); //0 car on fait du mpi et pas du openMP
+        rotate();
+    }
+    // Ici le rassemblement des données pour l'affichage
+
+    MPI_Gather(image+mpi_ligne*DIM, mpi_nbLigne*DIM , MPI_INT , image , mpi_nbLigne*DIM ,MPI_INT , 0 , MPI_COMM_WORLD) ;
+    return 0;
+}
