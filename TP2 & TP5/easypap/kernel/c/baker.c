@@ -163,14 +163,16 @@ int pgcd(int a, int b) {
 
 
 unsigned baker_compute_corners (unsigned nb_iter){
-    //
+    //int NB_CYCLE = 126661429;
+    int NB_CYCLE = 1000;
+    //  ./run --kernel baker --variant corners --load-image images/126661429.png --iterations 1 -ts 10
     int w = DIM/2;
     int h = DIM/2;
-    int cycleList[DIM*DIM];
-    printf("taille : %d\n",DIM);
+    printf("Taille : %d\n",DIM);
     int largeur = DIM;
     int hauteur = DIM;
     int*** cyclelistcoor = (int***) malloc(sizeof (int**)*DIM); //cyclelistcoor[x][y] = {x1,y1,x2,y2,x3,y3...xcyclelength,ycyclelength}
+    //càd la liste de toutes les positions que va occuper le pixel d'origine tout au long de son cycle
     int** cycleLength = (int**)malloc(sizeof(int*)*DIM); //cyclelength[x][y] = taille du cycle
 
     for (int i=0;i<largeur;i++){
@@ -183,15 +185,17 @@ unsigned baker_compute_corners (unsigned nb_iter){
 #pragma omp parallel for collapse(2)
         for (int i = 0; i < largeur; i++) {
             for (int j = 0; j < hauteur; j++) {
-                int *tab2 = (int *) malloc(sizeof(int) * 5000); //tableau qui va contenir chaque coordonnees des pixels du cycle
-                tab2[0] = i;
+                int *tab2 = (int *) malloc(sizeof(int) * 10000); //tableau qui va contenir chaque coordonnees des pixels du cycle
+                //: implementer une structure plus efficace
+                tab2[0] = i; //origine
                 tab2[1] = j;
                 int originX = i;
                 int originY = j;
-                int cycle = 1;
+                int cycle = 1; //longueur du cycle
                 float x1 = j/2;
                 float x2 = j%2;
                 int curX,curY;
+                //étape d'initialisation
                 if(i<DIM/2){
                     curX=2*i+x2;
                     curY=x1;
@@ -200,7 +204,7 @@ unsigned baker_compute_corners (unsigned nb_iter){
                     curY=2*w-x1-1;
                 }
                 int compteur=2;
-                while((originX!=curX || originY!=curY) && compteur<5000){
+                while((originX!=curX || originY!=curY) && compteur<5000){ //tant que l'on ne revient pas au point de départ on itère et on remplit notre tableau de cycle
                     tab2[compteur++] = curX;
                     tab2[compteur++] = curY;
                     cycle++;
@@ -216,15 +220,14 @@ unsigned baker_compute_corners (unsigned nb_iter){
                 }
 #pragma omp critical
                 {
-                    //cycleList[originY * DIM + originX] = cycle;
                     cyclelistcoor[i][j]=tab2;
                     cycleLength[i][j]=cycle;
                 }
-                //printf("Pour le pixel de coor : %d:%d (i:j) on a un cycle de :%d\t%d\n",originX,originY,cycle,cycleList[originY*DIM+originX]);
+                //printf("Pour le pixel de coor : %d:%d (i:j) on a un cycle de :%d\t%d\n",originX,originY,cycle,cycleLength[originX][origin[Y]);
             }
 
         }
-    //reduction du taleau qui contient les longueur des cycles afin de voir le nombre de cycle
+    //reduction du taleau qui contient les longueur des cycles afin de voir l'ensemble des cycles de tailles differentes
         printf("\n");
         int cycleListUniq[DIM*DIM];
         int index=0;
@@ -246,7 +249,7 @@ unsigned baker_compute_corners (unsigned nb_iter){
         for(int m = 1; m<index;m++) {
             printf("%d ",cycleListUniq[m]);
         }
-    /*for (int i=0;i<largeur;i++){
+    /*for (int i=0;i<largeur;i++){ // à utiliser pour voir les cycles, modifier largeur et hauteur à 2
         for (int j=0;j<hauteur;j++){
             int length = cycleLength[i][j];
             printf("Taille du cycle : %d [",length);
@@ -260,7 +263,7 @@ unsigned baker_compute_corners (unsigned nb_iter){
     for (int i = 0; i < largeur; i++) {
         for (int j = 0; j < hauteur; j++) {
             int length = cycleLength[i][j];
-            int reste = 126661429%length;
+            int reste = NB_CYCLE%length;
             /*printf("Pour %d/%d on a un cycle de %d et le reste est %d soit la coor %d/%d \n",i,j,length,reste,cyclelistcoor[i][j][reste*2],cyclelistcoor[i][j][reste*2+1]);
             printf("Taille du cycle : %d [",length);
             for(int x = 0; x<length*2;x+=2){
@@ -270,6 +273,7 @@ unsigned baker_compute_corners (unsigned nb_iter){
              */
             //printf("From %d/%d to %d/%d",i,j,cyclelistcoor[i][j][reste*2],cyclelistcoor[i][j][reste*2+1]);
             next_img(cyclelistcoor[i][j][reste*2],cyclelistcoor[i][j][reste*2+1])=cur_img(i,j);
+            //le pixel courant va prendre la place du pixel à la postion "reste" du cycle, il avance de "reste" position
 
         }
     }
