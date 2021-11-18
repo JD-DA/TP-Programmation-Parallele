@@ -163,8 +163,8 @@ int pgcd(int a, int b) {
 
 
 unsigned baker_compute_corners (unsigned nb_iter){
-    //int NB_CYCLE = 126661429;
-    int NB_CYCLE = 1000;
+    int NB_CYCLE = 126661429;
+    //int NB_CYCLE = 1000;
     //  ./run --kernel baker --variant corners --load-image images/126661429.png --iterations 1 -ts 10
     int w = DIM/2;
     int h = DIM/2;
@@ -272,7 +272,8 @@ unsigned baker_compute_corners (unsigned nb_iter){
             printf("\n");
              */
             //printf("From %d/%d to %d/%d",i,j,cyclelistcoor[i][j][reste*2],cyclelistcoor[i][j][reste*2+1]);
-            next_img(cyclelistcoor[i][j][reste*2],cyclelistcoor[i][j][reste*2+1])=cur_img(i,j);
+            //next_img(cyclelistcoor[i][j][reste*2],cyclelistcoor[i][j][reste*2+1])=cur_img(i,j);
+            next_img(i,j) = cur_img(cyclelistcoor[i][j][reste*2],cyclelistcoor[i][j][reste*2+1]);
             //le pixel courant va prendre la place du pixel à la postion "reste" du cycle, il avance de "reste" position
 
         }
