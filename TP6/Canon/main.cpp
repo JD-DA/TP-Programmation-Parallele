@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "fonctions.h"
-
+#define DEBUG = 1;
 using namespace std;
 
 int main(int argc, char *argv[]) {
@@ -36,6 +36,7 @@ int main(int argc, char *argv[]) {
   // Les coordonnées du processus pid dans la grille logique créée
   int mycoords[2];
   MPI_Cart_coords(Comm_grille, pid, 2, mycoords);
+  //rang vers coords
 
   int *A;
   int *B;
@@ -60,7 +61,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Préparation des paramètres pour la gestion des blocs (un par processus)
-  int l = n / nbprocs_dims[0];
+  int l = n / nbprocs_dims[0]; //soit la racine carrée de DIM
   int *Alocal = new int[l * l];
   int *Blocal = new int[l * l];
   int *Clocal = new int[l * l];
@@ -77,7 +78,7 @@ int main(int argc, char *argv[]) {
       Coords_dest[0] = i;
       for (int j = 0; j < nbprocs_dims[1]; j++) {
         Coords_dest[1] = j;
-        MPI_Cart_rank(Comm_grille, Coords_dest, &dest);
+        MPI_Cart_rank(Comm_grille, Coords_dest, &dest); //donne le rang du pid avec lequel communiquer
         if (dest != root) {
           extraction(A, extract, i, j, n, l);
           MPI_Ssend(extract, l * l, MPI_INT, dest, TAG1, MPI_COMM_WORLD);
