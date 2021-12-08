@@ -28,6 +28,31 @@ void QuickSort(int* A, int q, int r) {
     }
 }
 
+void QuickSortRec(int* A, int q, int r,int num_threads) {
+    int* s = new int[num_threads];
+    int* r = new int[num_threads];
+    Partitionnement(A+q,r-q,A[q],num_threads,s,r);
+    int* somme_left = new int[num_threads];
+    int* somme_right = new int[num_threads];
+    SommePrefixe(s,r,somme_left,somme_right,num_threads);
+
+    int* res = new int[r];///////////////////////////////////////////////// TO DO
+    Rearrangement(somme_left,somme_right, A[q], res, r, num_threads)
+    if (q<r) {
+        int x = A[q];
+        int s = q;
+        for (int i=q+1; i<r; i++) {
+            if (A[i]<=x) {
+                s++;
+                swap(A+s,A+i);
+            }
+        }
+        swap(A+q,A+s);
+        QuickSort(A,q,s,);
+        QuickSort(A,s+1,r);
+    }
+}
+
 /*
     * tab est le tableau de données
     * n sa longueur
